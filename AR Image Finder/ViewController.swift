@@ -42,7 +42,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Detect images
         configuration.maximumNumberOfTrackedImages = 2
         configuration.trackingImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)!
-
+        
         // Run the view's session
         sceneView.session.run(configuration)
     }
@@ -53,7 +53,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Pause the view's session
         sceneView.session.pause()
     }
-
+    
     // MARK: - ARSCNViewDelegate
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         
@@ -78,20 +78,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create plane of the same size
         let height = 69 / 65 * size.height
         let weight = image.name == "horses" ?
-           157 / 150 * 15 / 8.4475 * size.width :
+            157 / 150 * 15 / 8.4475 * size.width :
             157 / 150 * 15 / 5.5587 * size.width
         
         let plane = SCNPlane(width: weight, height: height)
         plane.firstMaterial?.diffuse.contents = image.name == "horses" ?
-            UIImage(named: "monument") :
-            videoPlayer
+            videoPlayer :
+            UIImage(named: "bridge")
         
-        
+        // Play video
         if image.name == "horses" {
             videoPlayer.play()
         }
-        
-        
         
         // Create plane node
         let planeNode = SCNNode(geometry: plane)
@@ -104,18 +102,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         planeNode.runAction(
             .sequence([
                 .wait(duration: 10),
-                .fadeOut(duration: 3),
-                .removeFromParentNode()
-        ]))
+                //.fadeOut(duration: 3),
+                //.removeFromParentNode()
+            ]))
         
         // Add plane node to the given node
         node.addChildNode(planeNode)
         
-        print(#line, #function, image.name , image.physicalSize)
+        //print(#line, #function, image.name , image.physicalSize)
     }
     
     func nodeAdded(_ node: SCNNode, for planeAnchor: ARPlaneAnchor) {
         print(#line, #function, "Plane \(planeAnchor) added")
     }
-
+    
 }
