@@ -5,8 +5,6 @@
 //  Created by Evgeniy Goncharov on 28.06.2021.
 //
 
-import UIKit
-import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
@@ -15,6 +13,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // MARK: - IBOutlets
     @IBOutlet var sceneView: ARSCNView!
     
+    // MARK: Private Properties
+    private let videoPlayer: AVPlayer = {
+        let url = Bundle.main.url(forResource: "rub",
+                                  withExtension: "mp4",
+                                  subdirectory: "art.scnassets")!
+        return AVPlayer(url: url)
+    }()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -26,8 +31,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
     }
-    
-    
     
     // MARK: - Override Method
     override func viewWillAppear(_ animated: Bool) {
@@ -67,6 +70,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func nodeAdded(_ node: SCNNode, for imageAnchor: ARImageAnchor) {
+        
         // Get image size
         let image = imageAnchor.referenceImage
         let size = image.physicalSize
@@ -80,16 +84,29 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let plane = SCNPlane(width: weight, height: height)
         plane.firstMaterial?.diffuse.contents = image.name == "horses" ?
             UIImage(named: "monument") :
-            UIImage(named: "bridge")
+            videoPlayer
+        
+        
+        if image.name == "horses" {
+            videoPlayer.play()
+        }
+        
         
         
         // Create plane node
         let planeNode = SCNNode(geometry: plane)
         planeNode.eulerAngles.x = -.pi / 2
-        //planeNode.opacity = 0.5
         
         // Move plane
         planeNode.position.x += image.name == "theatre" ? 0.01 : 0
+        
+        //Run animation
+        planeNode.runAction(
+            .sequence([
+                .wait(duration: 10),
+                .fadeOut(duration: 3),
+                .removeFromParentNode()
+        ]))
         
         // Add plane node to the given node
         node.addChildNode(planeNode)
